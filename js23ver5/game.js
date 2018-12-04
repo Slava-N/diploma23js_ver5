@@ -19,7 +19,6 @@ class Vector {
     return new Vector(this.x * multiplier, this.y * multiplier);
   }
 }
-
 class Actor {
     constructor(position = new Vector, size = new Vector(1, 1), speed = new Vector()) {
 
@@ -95,7 +94,7 @@ class Level {
   constructor(grid = [], actors = []) {
     this.grid = grid.slice();
     this.actors = actors.slice();
-    this.player = this.actors.find(actor => actor.type === 'player');
+    this.player = this.actors.find(actor => actor.type === 'Player');
     this.height = grid.length;
     this.width = Math.max(0, ...grid.map(item => item.length));
     this.status = null;
@@ -174,7 +173,12 @@ class Level {
 
 let obstacles = {
     '!': 'lava',
-    'x': 'wall'
+    'x': 'wall',
+    'o': 'coin',
+    '@': 'Player',
+    '=': 'horizontalFireball',
+    '|': 'VerticalFireball',
+    'v': 'fireRain'
 }
 
 class LevelParser {
@@ -225,12 +229,151 @@ class Player extends Actor {
     }
 
     get type() {
-        return 'player';
+        return 'Player';
     }
 
 }
 
+class Fireball extends Actor {
 
+    constructor(coordinates = new Vector(), speed = new Vector()) {
+        // this.coordinates = coordinates;
+        // this.speed = speed;
+        super(coordinates, new Vector(1,1), speed);
+
+    }
+
+    get type() {
+        const type ='fireball';
+        return type
+
+    }
+
+    getNextPosition(fireTime = 1) {
+
+        const move = this.speed.times(fireTime);
+        return this.pos.plus(move)
+        
+    }
+
+    handleObstacle() {
+        this.speed = this.speed.times(-1);
+
+        return
+    }
+
+    act(time, level) {
+        const nextPositionOnLevel = this.getNextPosition(time);
+        if (level.obstacleAt(nextPositionOnLevel, this.size)) {
+            this.handleObstacle();
+        } else {
+            this.pos = nextPositionOnLevel;
+        }
+    }
+}
+
+
+class HorizontalFireball extends Fireball {
+    constructor(coordinates = new Vector) {
+        super(coordinates, new Vector(2,0));
+    }
+}
+
+class VerticalFireball extends Fireball {
+    constructor(coordinates = new Vector) {
+        super(coordinates, new Vector(0,2));
+    }
+}
+
+class FireRain extends Fireball {
+    constructor(position) {
+        super(position, new Vector(0, 3));
+        this.startPosition = position;
+    }
+
+    handleObstacle() {
+        this.pos = this.startPosition;
+    }
+}
+
+class Coin extends Actor {
+    constructor(position = new Vector(0, 0)) {
+        const pos = position.plus(new Vector(0.2, 0.1));
+        super(pos, new Vector(0.6, 0.6));
+        this.springSpeed = 8;
+        this.springDist = 0.07;
+        this.spring = Math.random() * 2 * Math.PI;
+        this.startPlace = this.pos;
+    }
+
+    get type() {
+        return 'coin';
+    }
+
+    updateSpring(number = 1) {
+        this.spring += this.springSpeed * number;
+    }
+
+    getSpringVector() {
+        return new Vector(0, Math.sin(this.spring) * this.springDist);
+    }
+
+    getNextPosition(number = 1) {
+        this.updateSpring(number);
+        return this.startPlace.plus(this.getSpringVector());
+    }
+
+    act(time) {
+        this.pos = this.getNextPosition(time);
+    }
+}
+
+
+
+
+
+const schemas = [
+    [
+        '         ',
+        '         ',
+        '    =    ',
+        '       o ',
+        '     !xxx',
+        ' @       ',
+        'xxx!     ',
+        '         '
+    ],
+    [
+        '      v  ',
+        '    v    ',
+        '  v      ',
+        '        o',
+        '        x',
+        '@   x    ',
+        'x        ',
+        '         '
+    ]
+];
+
+const parser = new LevelParser(obstacles);
+runGame(schemas, parser, DOMDisplay)
+    .then(() => console.log('Вы выиграли приз!'));
+// const schema = [
+//     '         ',
+//     '         ',
+//     '         ',
+//     '         ',
+//     '     xxxx',
+//     ' @       ',
+//     'xxx!     ',
+//     '         '
+// ];
+// const actorDict = {
+//     '@': Player
+// }
+// const parser = new LevelParser(actorDict);
+// const level = parser.parse(schema);
+// runLevel(level, DOMDisplay);
 
 
 
