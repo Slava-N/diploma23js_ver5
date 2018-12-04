@@ -94,7 +94,7 @@ class Level {
   constructor(grid = [], actors = []) {
     this.grid = grid.slice();
     this.actors = actors.slice();
-    this.player = this.actors.find(actor => actor.type === 'Player');
+    this.player = this.actors.find(actor => actor.type === 'player');
     this.height = grid.length;
     this.width = Math.max(0, ...grid.map(item => item.length));
     this.status = null;
@@ -173,12 +173,12 @@ class Level {
 
 let obstacles = {
     '!': 'lava',
-    'x': 'wall',
-    'o': 'coin',
-    '@': 'Player',
-    '=': 'horizontalFireball',
-    '|': 'VerticalFireball',
-    'v': 'fireRain'
+    'x': 'wall'
+    // 'o': 'coin',
+    // '@': 'player',
+    // '=': 'horizontalFireball',
+    // '|': 'verticalFireball',
+    // 'v': 'fireRain'
 }
 
 class LevelParser {
@@ -223,13 +223,15 @@ class LevelParser {
 
 }
 
+
+
 class Player extends Actor {
     constructor(position = new Vector(0, 0)) {
         super(position.plus(new Vector(0, -0.5)), new Vector(0.8, 1.5));
     }
 
     get type() {
-        return 'Player';
+        return 'player';
     }
 
 }
@@ -330,8 +332,6 @@ class Coin extends Actor {
 
 
 
-
-
 const schemas = [
     [
         '         ',
@@ -345,8 +345,8 @@ const schemas = [
     ],
     [
         '      v  ',
-        '    v    ',
-        '  v      ',
+        '         ',
+        '         ',
         '        o',
         '        x',
         '@   x    ',
@@ -354,26 +354,11 @@ const schemas = [
         '         '
     ]
 ];
-
-const parser = new LevelParser(obstacles);
+const actorDict = {
+    '@': Player,
+    'v': FireRain,
+    'o': Coin
+}
+const parser = new LevelParser(actorDict);
 runGame(schemas, parser, DOMDisplay)
-    .then(() => console.log('Вы выиграли приз!'));
-// const schema = [
-//     '         ',
-//     '         ',
-//     '         ',
-//     '         ',
-//     '     xxxx',
-//     ' @       ',
-//     'xxx!     ',
-//     '         '
-// ];
-// const actorDict = {
-//     '@': Player
-// }
-// const parser = new LevelParser(actorDict);
-// const level = parser.parse(schema);
-// runLevel(level, DOMDisplay);
-
-
-
+    .then(() => alert('Вы выиграли приз!'));
