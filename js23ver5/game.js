@@ -10,8 +10,7 @@ class Vector {
     if (!(vector instanceof Vector)) {
       throw new Error("Можно прибавлять к вектору только вектор типа Vector");
     }
-    // const newVector = ;
-    return new Vector(this.x + vector.x, this.y + vector.y);        
+    return new Vector(this.x + vector.x, this.y + vector.y);
   }
 
   times(multiplier = 1) {
@@ -40,7 +39,6 @@ class Actor {
     }
 
     get type() {
-        // const thisType = 'actor';
         return 'actor';
     }
 
@@ -220,13 +218,10 @@ class Player extends Actor {
 
 class Fireball extends Actor {
     constructor(coordinates = new Vector(), speed = new Vector()) {
-        // this.coordinates = coordinates;
-        // this.speed = speed;
         super(coordinates, new Vector(1,1), speed);
     }
 
     get type() {
-        // const type ='fireball';
         return 'fireball'
     }
 
