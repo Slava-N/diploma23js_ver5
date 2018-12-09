@@ -1,7 +1,6 @@
 'use strict';
 
 class Vector {
-
   constructor(x = 0, y = 0) {
     this.x = x;
     this.y = y;
@@ -11,14 +10,15 @@ class Vector {
     if (!(vector instanceof Vector)) {
       throw new Error("Можно прибавлять к вектору только вектор типа Vector");
     }
-    const newVector = new Vector(this.x + vector.x, this.y + vector.y);
-    return newVector;
+    // const newVector = ;
+    return new Vector(this.x + vector.x, this.y + vector.y);        
   }
 
-  times(multiplier=1.00) {
+  times(multiplier = 1) {
     return new Vector(this.x * multiplier, this.y * multiplier);
   }
 }
+
 class Actor {
     constructor(position = new Vector, size = new Vector(1, 1), speed = new Vector()) {
 
@@ -40,8 +40,8 @@ class Actor {
     }
 
     get type() {
-        const thisType = 'actor';
-        return thisType;
+        // const thisType = 'actor';
+        return 'actor';
     }
 
     get left() {
@@ -79,14 +79,9 @@ class Actor {
 
         if (this.top >= argActor.bottom) {
           return false;
-
         }
 
-        if (this.bottom <= argActor.top) {
-          return false;
-        }
-
-        return true;
+        return this.bottom > argActor.top;
     }
 }
 
@@ -102,20 +97,14 @@ class Level {
   }
 
   isFinished() {
-      if ((this.status != null) && (this.finishDelay < 0)) {
-          return true
-      } else {
-          return false;
-      }
+      return (this.status != null) && (this.finishDelay < 0);
   }
 
   actorAt(movingActor) {
       if (!(movingActor instanceof Actor)) {
           throw new Error('Object was not passed or passed object is not Actor');
       }
-
-      let intersection = this.actors.find(thisActor => movingActor.isIntersect(thisActor));
-      return intersection;
+      return this.actors.find(thisActor => movingActor.isIntersect(thisActor));
   }
 
   obstacleAt(newPosition = new Vector, objSize = new Vector())  {
@@ -169,20 +158,14 @@ class Level {
         }
       }
 }
-   //finish
 
 let obstacles = {
     '!': 'lava',
-    'x': 'wall'
-    // 'o': 'coin',
-    // '@': 'player',
-    // '=': 'horizontalFireball',
-    // '|': 'verticalFireball',
-    // 'v': 'fireRain'
-}
+    'x': 'wall',
+};
+
 
 class LevelParser {
-
     constructor(levelObjects = {}) {
         this.levelObjects = Object.assign({}, levelObjects);
     }
@@ -200,7 +183,6 @@ class LevelParser {
     }
 
     createActors(objectsArray) {
-
         const actorsList = [];
         objectsArray.forEach((itemY, y) => {
             itemY.split('').forEach((itemX, x) => {
@@ -237,31 +219,24 @@ class Player extends Actor {
 }
 
 class Fireball extends Actor {
-
     constructor(coordinates = new Vector(), speed = new Vector()) {
         // this.coordinates = coordinates;
         // this.speed = speed;
         super(coordinates, new Vector(1,1), speed);
-
     }
 
     get type() {
-        const type ='fireball';
-        return type
-
+        // const type ='fireball';
+        return 'fireball'
     }
 
     getNextPosition(fireTime = 1) {
-
         const move = this.speed.times(fireTime);
         return this.pos.plus(move)
-        
     }
 
     handleObstacle() {
         this.speed = this.speed.times(-1);
-
-        return
     }
 
     act(time, level) {
@@ -348,17 +323,21 @@ const schemas = [
         '         ',
         '         ',
         '        o',
-        '        x',
+        '  |     x',
         '@   x    ',
         'x        ',
         '         '
     ]
 ];
+
 const actorDict = {
     '@': Player,
     'v': FireRain,
-    'o': Coin
-}
+    'o': Coin,
+    '=': HorizontalFireball,
+    '|': VerticalFireball
+};
+
 const parser = new LevelParser(actorDict);
 runGame(schemas, parser, DOMDisplay)
     .then(() => alert('Вы выиграли приз!'));
