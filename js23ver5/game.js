@@ -186,7 +186,7 @@ class LevelParser {
             itemY.split('').forEach((itemX, x) => {
                 const constructorActors = this.actorFromSymbol(itemX);
                 if (typeof constructorActors !== 'function') {
-                    return null;
+                    return
                 }
                 const result = new constructorActors(new Vector(x, y));
                 if (result instanceof Actor) {
